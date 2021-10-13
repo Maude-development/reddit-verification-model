@@ -1,0 +1,382 @@
+fmod REDDIT is
+    pr STRING .
+    pr NAT-LIST .
+    
+    *** State declaration ***
+    sort State .
+
+    *** User declaration ***
+    sorts User UserSet .
+    subsort User < UserSet .
+    
+    op none : -> UserSet [ctor] .
+    op __ : UserSet UserSet -> UserSet [assoc comm id: none] .
+    
+    *** SubReddit declaration ***
+    sorts SubReddit SubRedditSet .
+    subsort SubReddit < SubRedditSet .
+    
+    op none : -> SubRedditSet [ctor] .
+    op __ : SubRedditSet SubRedditSet -> SubRedditSet [assoc comm id: none] .
+    
+    *** Post declaration **
+    sorts Post PostSet .
+    subsort Post < PostSet .
+    
+    op none : -> PostSet [ctor] .
+    op __ : PostSet PostSet -> PostSet [assoc comm id: none] .
+
+    *** Vote declaration ***
+    sorts Vote VoteSet .
+    subsort Vote < VoteSet .
+    
+    op none : -> VoteSet [ctor] .
+    op __ : VoteSet VoteSet -> VoteSet [assoc comm id: none] .
+    
+    *** Constructors ***
+    op user : Nat String NatList NatList NatList -> User [ctor] . --- Id, Name, Subscribed SubReddits, Created Posts, Obtained total Votes (Total Karma)
+    op subr : Nat String String NatList NatList -> SubReddit [ctor] . --- Id, Name, Description, Users subscribed to SubReddit, Posts in SubReddit
+    op post : Nat String String Nat NatList NatList -> Post [ctor] . --- Id, Title, Text, User ID (creator), Comments underneath, Votes on post
+    op vote : Nat Nat Nat Bool -> Vote [ctor] . --- Id, User who voted, Post where vote belongs, Value(positive or negative) 
+
+endfm
+
+fmod REDDIT-EQ is
+    protecting REDDIT .
+
+    *** Actions ***
+    sorts Action ActionList . 
+    subsort Action < ActionList .
+
+    --- Create an ActionList that will determine what actions can be performed in the State
+    op nil : -> ActionList [ctor] .
+    op _,_ : ActionList ActionList -> ActionList [assoc id: nil] . 
+
+    --- Create a User (Add User to Reddit)
+    op createuser : String -> Action . --- Username
+    --- Delete a User (Delete User from Reddit)
+    op deleteuser : Nat -> Action . --- Post ID
+    --- Create a SubReddit (Add User to Reddit)
+    op createsub : Nat String String -> Action . --- User ID, SubReddit's Name, SubReddit's Description
+    --- Delete a SubReddit (Delete SubReddit from Reddit)
+    op deletesub : Nat -> Action . --- SubReddit ID
+    --- Create a Post (Add Post to User and SubReddit's PostLists)
+    op createpost : Nat Nat String String -> Action . --- User ID, SubReddit ID, Title, Text
+    --- Delete a Post (Delete Post from User and SubReddit's PostLists and delete all comments and votes made on that post)
+    op deletepost : Nat -> Action . --- Post ID
+    --- Subscribe User to SubReddit (User add SubReddit to their list of SubReddits and vice versa)
+    op subscribe : Nat Nat -> Action . --- User ID, SubReddit ID
+    --- Unsubscribe User (User remove SubReddit from their list of SubReddits and vice versa)
+    op unsubscribe : Nat Nat -> Action . --- User ID, SubReddit ID
+    --- Create a Comment (Add Post to Post's list of Comments)
+    op reply : Nat Nat String -> Action . --- User ID, Post ID, Text
+    --- Delete a Comment (Remove Post from Post's list of Comments)
+    op deletereply : Nat -> Action . --- Comment(Post) ID
+    --- Cast a Vote on a Post (Add Vote to User and Post's lists of votes)
+    op addvote : Nat Nat Bool -> Action . --- User ID, Post ID, Upvote or Downvote
+    --- Delete a Vote from a Post (Delete Vote from User and Post's lists of votes)
+    op deletevote : Nat -> Action . --- Vote ID
+
+    --- Delete a SubReddit in cascade 
+    op deleteSubCascade : State NatList -> State . 
+    --- Delete a Comment in cascade (Remove Post from Post's list of Comments)
+    op deletePostCascade : State NatList -> State . 
+    --- Delete a Comment in cascade (Remove Post from Post's list of Comments)
+    op deleteReplyCascade : State NatList -> State . 
+
+    *** Operators *** 
+    op hasVoted? : VoteSet Nat Nat -> Bool .
+
+    *** Initial State ***
+    op _|_|_|_|_|_ : Nat UserSet SubRedditSet PostSet VoteSet ActionList -> State [ctor] .
+
+    *** Variables ***
+    var Us : User . 
+    var Sub : SubReddit .
+    var P : Post .
+    var V : Vote .
+    var N : Nat .
+    vars NL NL' NL'' : NatList .
+    --- --- ---
+    vars T Txt SName SDesc : String . --- Variables for Title, Text
+    vars UList SList PList CList VList : NatList . --- Lists
+    vars UList' SList' PList' CList' VList' : NatList . --- Lists'
+    vars UId PId VId : Nat . --- IDs
+    var CNT : Nat . --- Counter for creating IDs
+    var B : Bool . --- Boolean to Upvote or Downvote
+    --- Sets ---
+    var USet : UserSet .
+    var SSet SSet' : SubRedditSet .
+    var PSet PSet' : PostSet .
+    var VSet : VoteSet .
+    var AList : ActionList .
+
+    *** Axioms ***
+    *** Idempotency ***
+    eq Us Us = Us .
+    eq Sub Sub = Sub .
+    eq P P = P . 
+    eq V V = V .
+
+    *** Equations ***
+    eq deleteSubCascade(CNT | USet | SSet subr(N, SName, SDesc, UList NL'' UList', PList) SSet' | PSet | VSet | AList, NL N NL') = deleteSubCascade(CNT | USet | (SSet SSet') | PSet | VSet | AList, NL NL' NL'') .
+    eq deleteSubCascade(CNT | USet | SSet subr(N, SName, SDesc, UList, PList NL'' PList') SSet' | PSet | VSet | AList, NL N NL') = deleteSubCascade(CNT | USet | (SSet SSet') | PSet | VSet | AList, NL NL' NL'') .
+    eq deleteSubCascade(CNT | USet | SSet | PSet | VSet | AList, NL) = CNT | USet | SSet | PSet | VSet | AList [owise].
+
+    eq deleteReplyCascade(CNT | USet | SSet | PSet post(N, T, Txt, UId, CList NL'' CList', VList) PSet' | VSet | AList, NL N NL') = deleteReplyCascade(CNT | USet | SSet | (PSet PSet') | VSet | AList, NL NL' NL'') .
+    eq deleteReplyCascade(CNT | USet | SSet | PSet post(N, T, Txt, UId, CList, VList NL'' VList') PSet' | VSet | AList, NL N NL') = deleteReplyCascade(CNT | USet | SSet | (PSet PSet') | VSet | AList, NL NL' NL'') .
+    eq deleteReplyCascade(CNT | USet | SSet | PSet | VSet | AList, NL) = CNT | USet | SSet | PSet | VSet | AList [owise].
+    
+    eq hasVoted?(vote(VId, UId, PId, B) VSet, UId, PId) = true .
+    eq hasVoted?(VSet, UId, PId) = false [owise] . 
+
+    
+endfm
+
+mod REDDIT-RL is
+    protecting REDDIT-EQ .
+
+    *** Variables ***
+    vars T Txt T' Txt' UName SName SDesc : String . --- Variables for Title, Text, Username, SubReddit description
+    vars UList SList PList CList VList KList : NatList . --- Lists
+    vars UList' SList' PList' CList' VList' KList' : NatList . --- Lists'
+    vars UList'' SList'' PList'' CList'' VList'' KList'' : NatList . --- Lists''
+    vars UList''' SList''' PList''' CList''' VList''' KList''' : NatList . --- Lists'''
+    vars UId SId PId CId VId : Nat . --- IDs
+    vars UId' SId' PId' CId' VId' : Nat . --- ID's
+    var CNT : Nat . --- Counter for creating IDs
+    var B : Bool . --- Boolean to Upvote or Downvote
+    --- Sets ---
+    var USet : UserSet .
+    var SSet : SubRedditSet .
+    var PSet PSet' : PostSet .
+    var VSet VSet' : VoteSet .
+    var AList : ActionList .
+
+    *** Sequences as seen in the TFG paper ***
+    --- Initial State
+    op init : -> State .
+    eq init = 0 | none | none | none | none | aListInit , aListCInt .
+    --- Initial Reddit actions
+    ---7 initial actions(0-6)
+    op aListInit : -> ActionList .
+    eq aListInit = createuser("u/aLynx") , createuser("u/b0bbyPR") , createuser("u/chocoSystems") , createuser("u/dedTech") , createsub(0, "r/Maude", "Lorem ipsum") , createsub(0, "r/ModelChecking", "Lorem ipsum") , createsub(0, "r/FormalMethods", "Lorem ipsum") .
+    
+    *** Reddit action interactions ***
+    op aListInter1 : -> ActionList .
+    eq aListInter1 = createpost(0, 6, "Conference", "Conference link") , reply(1, 7, "Good job!") , deletepost(7) .
+    op aListInter2 : -> ActionList .
+    eq aListInter2 = createpost(0, 6, "Maude is cool", "Body of text") , reply(1, 7, "Nice") , reply(2, 8, "Delete this") , deletepost(8) .
+    op aListInter3 : -> ActionList .
+    eq aListInter3 = createpost(0, 6, "Post here", "Bottom text") , addvote(1, 7, true) , deletevote(8) .
+        
+    *** Reddit action interaction with counterintuitive effects ***
+    op aListCInt : -> ActionList .
+    eq aListCInt = subscribe(0, 6) , subscribe(1, 6) , subscribe(3, 6) , createpost(0, 6, "Conference", "Conference link") , addvote(1, 7, true) , reply(1, 7, "Good job!") , reply(2, 8, "What is this?") , deletepost(7) .
+ 
+    *** Tests w/ teachers ***
+    op initTest : -> State .
+    eq initTest = 0 | none | none | none | none | aList2 .
+    op initTest2 : Nat -> State .
+    eq initTest2(X:Nat) = 0 | none | none | none | none | aList3(X:Nat) [variant].
+    
+    op aList1 : -> ActionList .
+    eq aList1 = createuser("u/aLynx") , createuser("u/b0bbyPR") , createuser("u/chocoSystems") , createuser("u/dedTech") , createsub(0, "r/Maude", "Lorem ipsum") , createsub(0, "r/ModelChecking", "Lorem ipsum") , createsub(0, "r/FormalMethods", "Lorem ipsum") .
+    op aList2 : -> ActionList .
+    eq aList2 = aList1 , createpost(0, 4, "Title", "Text") , reply(3, 7, "Reply") , deletepost(7) .
+    op aList3 : Nat -> ActionList .
+    eq aList3(1) = aList2, createpost(1, 5, "Title2", "Text2") [variant].
+
+    *** Rules *** 
+    rl [createuser] : 
+        CNT | 
+        USet | 
+        SSet | 
+        PSet | 
+        VSet | 
+        createuser(UName) , AList
+        => 
+        CNT + 1 | 
+        USet user(CNT, UName, nil, nil, nil) | 
+        SSet | 
+        PSet | 
+        VSet | 
+        AList [narrowing] .
+
+    rl [deleteuser] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList UId UList', PList') | 
+        PSet | 
+        VSet | 
+        deleteuser(UId) , AList
+        => 
+        CNT | 
+        USet | 
+        SSet subr(SId, SName, SDesc, (UList UList'), PList') | 
+        PSet | 
+        VSet | 
+        AList [narrowing] .
+------------------------------------------------------------------------
+    rl [createsub] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet | 
+        VSet | 
+        createsub(UId, SName, SDesc) , AList
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(CNT, SName, SDesc, UId, nil)| 
+        PSet | 
+        VSet | 
+        AList [narrowing] .
+    
+    rl [deletesub] : 
+        CNT | 
+        USet | 
+        SSet subr(SId, SName, SDesc, UList, PList) | 
+        PSet | 
+        VSet | 
+        deletesub(SId) , AList
+        => 
+        deleteSubCascade(CNT |
+        USet |
+        SSet |
+        PSet |
+        VSet |
+        AList, UList PList) [narrowing] .
+------------------------------------------------------------------------
+    rl [createpost] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList') | 
+        PSet | 
+        VSet | 
+        createpost(UId, SId, T, Txt) , AList
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, (PList CNT), KList) | 
+        SSet subr(SId, SName, SDesc, UList, (PList' CNT)) | 
+        PSet post(CNT, T, Txt, UId, nil, nil) | 
+        VSet | 
+        AList [narrowing] .
+    
+    rl [deletepost] : 
+        CNT | 
+        USet user(UId, UName, SList, PList PId PList', KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList'' PId PList''') | 
+        PSet post(PId, T, Txt, UId, CList, VList) | 
+        VSet | 
+        deletepost(PId) , AList
+        => 
+        deleteReplyCascade(
+        CNT | 
+        USet user(UId, UName, SList, (PList PList'), KList) | 
+        SSet subr(SId, SName, SDesc, UList, (PList'' PList''')) | 
+        PSet | 
+        VSet | 
+        AList, CList VList) [narrowing] .
+------------------------------------------------------------------------
+    rl [subscribe] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList') | 
+        PSet | 
+        VSet | 
+        subscribe(UId, SId) , AList
+        => 
+        CNT | 
+        USet user(UId, UName, (SList SId), PList, KList) | 
+        SSet subr(SId, SName, SDesc, (UList UId), PList') | 
+        PSet | 
+        VSet | 
+        AList [narrowing] .
+    
+    rl [unsubscribe] : 
+        CNT | 
+        USet user(UId, UName, SList SId SList', PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList UId UList', PList') | 
+        PSet | 
+        VSet | 
+        unsubscribe(UId, SId) , AList
+        => 
+        CNT | 
+        USet user(UId, UName, (SList SList'), PList, KList) | 
+        SSet subr(SId, SName, SDesc, (UList UList'), PList') | 
+        PSet | 
+        VSet | 
+        AList [narrowing] .
+------------------------------------------------------------------------
+    rl [reply] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList) | 
+        VSet | 
+        reply(UId, PId, Txt') , AList
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, (PList CNT), KList) | 
+        SSet | 
+        PSet post(CNT, T, Txt', UId, nil, nil) post(PId, T, Txt, UId', (CList CNT), VList) | 
+        VSet | 
+        AList [narrowing] .
+    
+     rl [deletereply] :
+        CNT |
+        USet |
+        SSet |
+        PSet post(PId, T, Txt, UId, CList, VList) |
+        VSet |
+        deletereply(PId) , AList
+        =>
+        deleteReplyCascade(CNT |
+        USet |
+        SSet |
+        PSet |
+        VSet |
+        AList, CList VList) [narrowing] .
+-----------------------------------------------------------------------
+    rl [addvote] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList) | 
+        VSet | 
+        addvote(UId, PId, B) , AList
+        => 
+        if hasVoted?(VSet, UId, PId) 
+        then 
+            CNT | 
+            USet user(UId, UName, SList, PList, KList) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId', CList, VList) | 
+            VSet | 
+            AList
+        else
+            CNT + 1 | 
+            USet user(UId, UName, SList, PList, (KList CNT)) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId, CList, (VList CNT)) | 
+            VSet vote(CNT, UId, PId, B) | 
+            AList 
+        fi [narrowing] .
+
+    rl [deletevote] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList VId KList') | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList VId VList') | 
+        VSet | 
+        deletevote(VId) , AList
+        => 
+        CNT | 
+        USet user(UId, UName, SList, PList, (KList KList')) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, (VList VList')) | 
+        VSet | 
+        AList [narrowing] .
+
+endm

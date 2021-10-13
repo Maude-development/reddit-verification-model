@@ -1,0 +1,350 @@
+fmod REDDIT is
+    pr CONVERSION .
+    pr NAT-LIST .
+    
+    *** State declaration ***
+    sort State .
+
+    *** User declaration ***
+    sorts User UserSet .
+    subsort User < UserSet .
+    
+    op none : -> UserSet [ctor] .
+    op __ : UserSet UserSet -> UserSet [assoc comm id: none] .
+    
+    *** SubReddit declaration ***
+    sorts SubReddit SubRedditSet .
+    subsort SubReddit < SubRedditSet .
+    
+    op none : -> SubRedditSet [ctor] .
+    op __ : SubRedditSet SubRedditSet -> SubRedditSet [assoc comm id: none] .
+    
+    *** Post declaration **
+    sorts Post PostSet .
+    subsort Post < PostSet .
+    
+    op none : -> PostSet [ctor] .
+    op __ : PostSet PostSet -> PostSet [assoc comm id: none] .
+
+    *** Vote declaration ***
+    sorts Vote VoteSet .
+    subsort Vote < VoteSet .
+    
+    op none : -> VoteSet [ctor] .
+    op __ : VoteSet VoteSet -> VoteSet [assoc comm id: none] .
+    
+    *** Constructors ***
+    op user : Nat String NatList NatList NatList -> User [ctor] . --- Id, Name, Subscribed SubReddits, Created Posts, Obtained total Votes (Total Karma)
+    op subr : Nat String String NatList NatList -> SubReddit [ctor] . --- Id, Name, Description, Users subscribed to SubReddit, Posts in SubReddit
+    op post : Nat String String Nat NatList NatList -> Post [ctor] . --- Id, Title, Text, User ID (creator), Comments underneath, Votes on post
+    op vote : Nat Nat Nat Bool -> Vote [ctor] . --- Id, User who voted, Post where vote belongs, Value(positive or negative) 
+
+    *** Variables ***
+    var Us : User . 
+    var Sub : SubReddit .
+    var P : Post .
+    var V : Vote .
+    var N : Nat .
+    var NL : NatList .
+
+    *** Axioms ***
+    *** Idempotency ***
+    eq Us Us = Us .
+    eq Sub Sub = Sub .
+    eq P P = P . 
+    eq V V = V .
+
+endfm
+
+mod REDDIT-RL is
+    protecting REDDIT .
+
+    *** Variables ***
+    --- For rules ---
+    vars T Txt T' Txt' UName SName SDesc : String . --- Variables for Title, Text, Username, SubReddit description
+    vars UList SList PList CList VList KList : NatList . --- Lists
+    vars UList' SList' PList' CList' VList' KList' : NatList . --- Lists'
+    vars UList'' SList'' PList'' CList'' VList'' KList'' : NatList . --- Lists''
+    vars UList''' SList''' PList''' CList''' VList''' KList''' : NatList . --- Lists'''
+    vars UId SId PId CId VId : Nat . --- IDs
+    vars UId' SId' PId' CId' VId' : Nat . --- ID's
+    vars X CNT : Nat . --- Counter for creating IDs
+    var B : Bool . --- Boolean to Upvote or Downvote
+    --- Sets ---
+    var USet : UserSet .
+    var SSet : SubRedditSet .
+    var PSet : PostSet .
+    var VSet : VoteSet .
+    
+    *** Initial State ***
+    op _|_|_|_|_ : Nat UserSet SubRedditSet PostSet VoteSet -> State [ctor] .
+    
+    *** Sequences as seen in the TFG paper ***
+    --- Initial State
+    op init : -> State .
+    eq init = 0 | none | none | none | none .
+
+    *** Rules *** 
+    rl [createuser] : 
+        CNT | 
+        USet | 
+        SSet | 
+        PSet | 
+        VSet
+        => 
+        CNT + 1 | 
+        USet user(CNT, "u/User" + string(CNT, 10), nil, nil, nil) | 
+        SSet | 
+        PSet | 
+        VSet [narrowing] .
+
+    rl [deleteuser] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList UId UList', PList') | 
+        PSet | 
+        VSet 
+        => 
+        CNT | 
+        USet | 
+        SSet subr(SId, SName, SDesc, (UList UList'), PList') | 
+        PSet | 
+        VSet [narrowing] .
+------------------------------------------------------------------------
+    rl [createsub] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet | 
+        VSet 
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(CNT, "r/SUB" + string(CNT, 10), "Lorem ipsum", UId, nil)| 
+        PSet | 
+        VSet [narrowing] .
+    
+    rl [deletesub] : 
+        CNT | 
+        USet | 
+        SSet subr(SId, SName, SDesc, UList, PList) | 
+        PSet | 
+        VSet 
+        => 
+        CNT | 
+        USet | 
+        SSet | 
+        PSet | 
+        VSet [narrowing] .
+------------------------------------------------------------------------
+    rl [createpost] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList') | 
+        PSet | 
+        VSet 
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, (PList CNT), KList) | 
+        SSet subr(SId, SName, SDesc, UList, (PList' CNT)) | 
+        PSet post(CNT, "Title" + string(CNT, 10), "Text", UId, nil, nil) | 
+        VSet [narrowing] .
+    
+    rl [deletepost] : 
+        CNT | 
+        USet user(UId, UName, SList, PList PId PList', KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList'' PId PList''') | 
+        PSet post(PId, T, Txt, UId, CList, VList) | 
+        VSet 
+        => 
+        CNT | 
+        USet user(UId, UName, SList, (PList PList'), KList) | 
+        SSet subr(SId, SName, SDesc, UList, (PList'' PList''')) | 
+        PSet | 
+        VSet [narrowing] .
+
+------------------------------------------------------------------------
+    rl [subscribe] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList') | 
+        PSet | 
+        VSet 
+        => 
+        CNT | 
+        USet user(UId, UName, (SList SId), PList, KList) | 
+        SSet subr(SId, SName, SDesc, (UList UId), PList') | 
+        PSet | 
+        VSet [narrowing] .
+    
+    rl [unsubscribe] : 
+        CNT | 
+        USet user(UId, UName, SList SId SList', PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList UId UList', PList') | 
+        PSet | 
+        VSet 
+        => 
+        CNT | 
+        USet user(UId, UName, (SList SList'), PList, KList) | 
+        SSet subr(SId, SName, SDesc, (UList UList'), PList') | 
+        PSet | 
+        VSet [narrowing] .
+------------------------------------------------------------------------
+    rl [reply] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet subr(SId, SName, SDesc, UList, PList') | 
+        PSet post(PId, T, Txt, UId', CList, VList) | 
+        VSet 
+        => 
+        CNT + 1 | 
+        USet user(UId, UName, SList, (PList CNT), KList) | 
+        SSet subr(SId, SName, SDesc, UList, (PList' CNT)) | 
+        PSet post(CNT, T, "Txt", UId, nil, nil) post(PId, T, Txt, UId', (CList CNT), VList) | 
+        VSet [narrowing] .
+
+    rl [deletereply] : 
+        CNT | 
+        USet | 
+        SSet | 
+        PSet post(PId, T, Txt, UId, CList, VList) | 
+        VSet 
+        => 
+        CNT | 
+        USet | 
+        SSet | 
+        PSet | 
+        VSet [narrowing] .
+
+-----------------------------------------------------------------------
+    op hasVoted? : VoteSet Nat Nat -> Bool .
+    eq hasVoted?(vote(VId, UId, PId, B) VSet, UId, PId) = true .
+    eq hasVoted?(VSet, UId, PId) = false [owise] . 
+    rl [upvote] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList) | 
+        VSet 
+        => 
+        if hasVoted?(VSet, UId, PId) 
+        then 
+            CNT | 
+            USet user(UId, UName, SList, PList, KList) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId', CList, VList) | 
+            VSet
+        else
+            CNT + 1 | 
+            USet user(UId, UName, SList, PList, (KList CNT)) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId, CList, (VList CNT)) | 
+            VSet vote(CNT, UId, PId, true) 
+        fi [narrowing] .
+
+    rl [downvote] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList) | 
+        VSet 
+        => 
+        if hasVoted?(VSet, UId, PId) 
+        then 
+            CNT | 
+            USet user(UId, UName, SList, PList, KList) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId', CList, VList) | 
+            VSet
+        else
+            CNT + 1 | 
+            USet user(UId, UName, SList, PList, (KList CNT)) | 
+            SSet | 
+            PSet post(PId, T, Txt, UId, CList, (VList CNT)) | 
+            VSet vote(CNT, UId, PId, false) 
+        fi [narrowing] .
+
+    rl [deletevote] : 
+        CNT | 
+        USet user(UId, UName, SList, PList, KList VId KList') | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, VList VId VList') | 
+        VSet 
+        => 
+        CNT | 
+        USet user(UId, UName, SList, PList, (KList KList')) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId', CList, (VList VList')) | 
+        VSet [narrowing] .
+
+endm
+mod REDDIT-PREDS is
+    pr REDDIT-RL .
+    including SATISFACTION .
+
+    *** Configuration (State) ***
+    sort Reddit .
+    subsort Reddit < State .
+
+    *** Variables ***
+    var CNT : Nat .
+    var USet : UserSet .
+    var SSet : SubRedditSet .
+    var PSet : PostSet .
+    var VSet : VoteSet .
+    var R : Reddit .
+    --- For rules ---
+    vars T Txt T' Txt' UName SName SDesc : String . --- Variables for Title, Text, Username, SubReddit description
+    vars UList SList PList CList VList KList : NatList . --- Lists
+    vars UList' SList' PList' CList' VList' KList' : NatList . --- Lists'
+    vars UList'' SList'' PList'' CList'' VList'' KList'' : NatList . --- Lists''
+    vars UList''' SList''' PList''' CList''' VList''' KList''' : NatList . --- Lists'''
+    vars UId SId PId CId VId : Nat . --- IDs
+    vars UId' SId' PId' CId' VId' : Nat . --- ID's
+    var B : Bool . --- Boolean to Upvote or Downvote
+
+    *** Operators ***
+    op vote : Nat -> Prop .
+    op user : Nat -> Prop .
+    op post : Nat -> Prop .
+
+    *** Equations ***
+    --- All existing posts will continue existing as long as they are not explicitly deleted.
+    --- postexists(N:Nat, U:Nat) => [] (postexists(N:Nat, U:Nat) W deletePost(NP))
+    ---eq < CNT | USet | SSet | PSet post(PId, T, Txt, UId, CList, VList) | VSet  > |= postexists(PId, UId) = true .
+    ---eq < CNT | USet | SSet | PSet | VSet  > |= userexists(UId) = true .
+
+
+    --- Every vote is always associated to its corresponding post
+    eq < CNT | USet | SSet | PSet | VSet vote(VId, UId, PId, B)  > |= vote(VId) = true .
+    eq < CNT | USet | SSet | PSet post(PId, T, Txt, UId', CList, VList VId VList') | VSet  > |= post(VId) = true .
+
+endm
+mod REDDIT-CHECK is
+    protecting REDDIT-PREDS .
+    including MODEL-CHECKER .
+    including LTL-SIMPLIFIER .
+
+    *** Variables ***
+    var CNT : Nat .
+    var USet : UserSet .
+    var SSet : SubRedditSet .
+    var PSet : PostSet .
+    var VSet : VoteSet .
+    var R : Reddit .
+
+    --- For rules ---
+    vars T Txt T' Txt' UName SName SDesc : String . --- Variables for Title, Text, Username, SubReddit description
+    vars UList SList PList CList VList KList : NatList . --- Lists
+    vars UList' SList' PList' CList' VList' KList' : NatList . --- Lists'
+    vars UList'' SList'' PList'' CList'' VList'' KList'' : NatList . --- Lists''
+    vars UList''' SList''' PList''' CList''' VList''' KList''' : NatList . --- Lists'''
+    vars UId SId PId CId VId : Nat . --- IDs
+    vars UId' SId' PId' CId' VId' : Nat . --- ID's
+    var B : Bool . --- Boolean to Upvote or Downvote
+
+
+    ---op initConfig1 : -> Reddit .
+    ---eq initConfig1 = < 0 | none | none | none | none  > .
+
+endm

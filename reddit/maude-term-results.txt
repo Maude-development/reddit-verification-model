@@ -1,0 +1,141 @@
+
+********* CASE 1 *********
+***** SOLUTION STATE *****
+Result of: search init =>! X:State .
+search in REDDIT-RL : init =>! X:State .
+
+Solution 1 (state 11)
+states: 12  rewrites: 28 in 1ms cpu (3ms real) (19178 rewrites/second)
+X:State --> 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, nil, nil)
+    user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4,
+    "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil)
+    subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil
+
+No more solutions.
+states: 12  rewrites: 28 in 1ms cpu (3ms real) (17565 rewrites/second)
+
+*** UNREACHABLE STATES ***
+search init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR",
+    nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil,
+    nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking",
+    "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none
+    | nil .
+
+No solution.
+states: 12  rewrites: 28 in 0ms cpu (0ms real) (32332 rewrites/second)
+
+search init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR",
+    nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil,
+    nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking",
+    "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none
+    | nil .
+
+No solution.
+states: 12  rewrites: 28 in 0ms cpu (0ms real) (98939 rewrites/second)
+
+search init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR",
+    nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil,
+    nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking",
+    "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none
+    | nil .
+
+No solution.
+states: 12  rewrites: 28 in 0ms cpu (0ms real) (64073 rewrites/second)
+
+search init =>* 11 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+search in REDDIT-RL : init =>* 11 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR",
+    nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil,
+    nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking",
+    "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none
+    | nil .
+
+No solution.
+states: 12  rewrites: 28 in 0ms cpu (0ms real) (67307 rewrites/second)
+----------
+
+********* CASE 2 *********
+***** SOLUTION STATE *****
+Result of: search init =>! X:State .
+search in REDDIT-RL : init =>! X:State .
+
+Solution 1 (state 12)
+states: 13  rewrites: 30 in 0ms cpu (0ms real) (54644 rewrites/second)
+X:State --> 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(
+    2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4,
+    "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil)
+    subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool",
+    "Body of text", 0, nil, nil) | none | nil
+
+No more solutions.
+states: 13  rewrites: 30 in 0ms cpu (0ms real) (46012 rewrites/second)
+
+
+********* CASE 3 *********
+***** SOLUTION STATE *****
+Result of: search init =>! X:State .
+search in REDDIT-RL : init =>! X:State .
+
+Solution 1 (state 10)
+states: 11  rewrites: 24 in 0ms cpu (0ms real) (27874 rewrites/second)
+X:State --> 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(
+    2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4,
+    "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil)
+    subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude post", "Bottom text",
+    1, nil, nil) | vote(8, 1, 7, true) | nil
+
+No more solutions.
+states: 11  rewrites: 24 in 0ms cpu (0ms real) (24615 rewrites/second)
+
+
+********* OTHER *********
+***** UNREACHABLE *****
+Result of: search init =>! X:State .
+search in REDDIT-RL : init =>! X:State .
+
+Solution 1 (state 12)
+states: 13  rewrites: 32 in 1ms cpu (3ms real) (23038 rewrites/second)
+X:State --> 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 5, nil) user(
+    2, "u/chocoSystems", nil, 7, nil) | subr(3, "r/FormalMethods", "Lorem ipsum", 0, 5) |
+    post(5, "Let's talk about Maude", "Body of text", 1, 7, nil) post(7,
+    "Let's talk about Maude", "...", 2, nil, nil) | none | nil
+
+No more solutions.
+states: 13  rewrites: 32 in 1ms cpu (3ms real) (21993 rewrites/second)
+
+
+search init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 5, nil) | subr(3, "r/FormalMethods", "Lorem ipsum", 0, 5) | post(5, "Let's talk about Maude", "Body of text", 1, 7, nil) post(7, "Let's talk about Maude", "...", 2, nil, nil) | none | nil .
+
+search init =>! 9 | user(0, "u/aLynx", nil, 4, nil) user(1, "u/b0bbyPR", nil, 5 6, nil) user(2, "u/chocoSystems", nil, 7 8, nil) | subr(3, "r/FormalMethods", "Lorem ipsum", 0, 4 5) | post(4, "Maude is cool", "Body of text", 0, 6 8, nil) post(5, "Let's talk about Maude", "Body of text", 1, 7, nil) post(6, "Maude is cool", "Nice", 1, nil, nil) post(7, "Let's talk about Maude", "...", 2, nil, nil) post(8, "Maude is cool", "Delete this", 2, nil, nil) | none | nil .
+
+search init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 5 6, nil) user(2, "u/chocoSystems", nil, 7 8, nil) | subr(3, "r/FormalMethods", "Lorem ipsum", 0, 5) | post(5, "Let's talk about Maude", "Body of text", 1, 7, nil) post(6, "Maude is cool", "Nice", 1, nil, nil) post(7, "Let's talk about Maude", "...", 2, nil, nil) post(8, "Maude is cool", "Delete this", 2, nil, nil) | none | nil .
+ 
+
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR",
+    nil, 5, nil) | subr(3, "r/FormalMethods", "Lorem ipsum", 0, 5) | post(5,
+    "Let's talk about Maude", "Body of text", 1, 7, nil) post(7, "Let's talk about Maude",
+    "...", 2, nil, nil) | none | nil .
+
+No solution.
+states: 13  rewrites: 32 in 0ms cpu (0ms real) (36281 rewrites/second)
+
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, 4, nil) user(1, "u/b0bbyPR",
+    nil, 5 6, nil) user(2, "u/chocoSystems", nil, 7 8, nil) | subr(3, "r/FormalMethods",
+    "Lorem ipsum", 0, 4 5) | post(4, "Maude is cool", "Body of text", 0, 6 8, nil) post(5,
+    "Let's talk about Maude", "Body of text", 1, 7, nil) post(6, "Maude is cool", "Nice",
+    1, nil, nil) post(7, "Let's talk about Maude", "...", 2, nil, nil) post(8,
+    "Maude is cool", "Delete this", 2, nil, nil) | none | nil .
+
+No solution.
+states: 13  rewrites: 32 in 0ms cpu (0ms real) (68522 rewrites/second)
+
+search in REDDIT-RL : init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR",
+    nil, 5 6, nil) user(2, "u/chocoSystems", nil, 7 8, nil) | subr(3, "r/FormalMethods",
+    "Lorem ipsum", 0, 5) | post(5, "Let's talk about Maude", "Body of text", 1, 7, nil)
+    post(6, "Maude is cool", "Nice", 1, nil, nil) post(7, "Let's talk about Maude", "...",
+    2, nil, nil) post(8, "Maude is cool", "Delete this", 2, nil, nil) | none | nil .
+
+No solution.
+states: 13  rewrites: 32 in 0ms cpu (0ms real) (48192 rewrites/second)

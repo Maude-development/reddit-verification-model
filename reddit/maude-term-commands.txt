@@ -1,0 +1,120 @@
+search init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1,"u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | post(X:Nat, S:String, F:String, Y:Nat, L:NatList, K:NatList) | none | nil .
+
+search init2(1) =>! 10 | user(0, "u/aLynx", nil, nil, nil) user(1,"u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | post(X:Nat, S:String, F:String, Y:Nat, L:NatList, K:NatList) | none | nil .
+search init2(1) =>! 10 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 9, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, 9) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | post(X:Nat, "Title2", "Text2", 1, nil, nil) | none | nil
+
+
+vu-narrow init2(Y:Nat) =>* 10 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 9, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, 9) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | post(X:Nat, "Title2", "Text2", 1, nil, nil) | none | nil .
+vu-narrow init2(Y:Nat) =>! 10 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 9, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, 9) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | post(X:Nat, "Title2", "Text2", 1, nil, nil) | none | nil .
+
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Case 1
+Result of: search init =>! X:State .
+--> 9 | user(0, "u/aLynx", nil, nil, nil) user(
+    1, "u/b0bbyPR", nil, nil, nil) user(2, 
+    "u/chocoSystems", nil, nil, nil) user(3, 
+    "u/dedTech", nil, nil, nil) | subr(4, 
+    "r/Maude", "Lorem ipsum", 0, nil) subr(5, 
+    "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, 
+    "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil
+...
+search init =>! 9 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) | subr(4, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+
+search init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+
+search init =>! 9 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+
+search init =>* 11 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, nil) | none | none | nil .
+------
+Case 2
+Result of: search init =>! X:State .
+--> 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil)
+    user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(
+    4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0,
+    nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool",
+    "Body of text", 0, nil, nil) | none | nil
+...
+search init =>! 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, 9, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool", "Body of text", 0, nil, nil) | none | nil .
+
+search init =>! 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil) user(2, "u/chocoSystems", nil, 9, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool", "Body of text", 0, nil, nil) | none | nil .
+
+search init =>! 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool", "Body of text", 0, nil, nil) | none | nil .
+
+search init =>! 10 | user(0, "u/aLynx", nil, nil, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, 9, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool", "Body of text", 0, nil, nil) | none | nil .
+
+search init =>* 10 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, 8, nil) user(2, "u/chocoSystems", nil, 9, nil) user(3, "u/dedTech", nil, nil, nil) | subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Maude is cool", "Body of text", 0, nil, nil) | none | nil .
+
+------
+Case 3
+Result of: search init =>! X:State .
+--> 9 | user(0, "u/aLynx", nil, nil, nil) user(
+    1, "u/b0bbyPR", nil, nil, nil) user(2,
+    "u/chocoSystems", nil, nil, nil) user(3,
+    "u/dedTech", nil, nil, nil) | subr(4, "r/Maude",
+    "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking",
+    "Lorem ipsum", 0, nil) subr(6, "r/FormalMethods",
+    "Lorem ipsum", 0, nil) | none | none | nil
+...
+search init =>! 
+
+------
+Case 4
+Result of: search init =>! X:State .
+--> 8 | user(0, "u/aLynx", nil, 7, nil) user(1, "u/b0bbyPR", nil, nil, nil)
+    user(2, "u/chocoSystems", nil, nil, nil) user(3, "u/dedTech", nil, nil, nil) |
+    subr(4, "r/Maude", "Lorem ipsum", 0, nil) subr(5, "r/ModelChecking", "Lorem ipsum",
+    0, nil) subr(6, "r/FormalMethods", "Lorem ipsum", 0, 7) | post(7, "Conference",
+    "Conference link", 0, nil, nil) | none | addvote(1, 7, true),reply(1, 7,
+    "Good job!"),reply(2, 8, "What is this?"),deletepost(7)
+...
+search init =>!
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+rl [OLDdeletereply] : 
+        CNT | 
+        USet user(UId, UName, SList, PList PId PList', KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId, CList, VList) post(PId', T', Txt', UId', CList' PId CList'', VList') | 
+        VSet | 
+        deletereply(PId) , AList
+        => 
+        CNT | 
+        USet user(UId, UName, SList, (PList PList'), KList) | 
+        SSet | 
+        PSet post(PId', T', Txt', UId', (CList' CList''), VList') | 
+        VSet | 
+        deletecascadeP(CList) , deletecascadeV(VList) , AList [narrowing] .
+    
+    rl [deletereplycascade] : 
+        CNT | 
+        USet user(UId, UName, SList, PList PId PList', KList) | 
+        SSet | 
+        PSet post(PId, T, Txt, UId, CList, VList) | 
+        VSet | 
+        deletereplycascade(PId) , AList
+        => 
+        CNT | 
+        USet user(UId, UName, SList, (PList PList'), KList) | 
+        SSet | 
+        PSet | 
+        VSet | 
+        deletecascadeP(CList) , deletecascadeV(VList) , AList [narrowing] .
+------------------------------------------------------------------------------------------------------------------------
+*** Tests w/ teachers ***
+    op init : -> State .
+    eq init = 0 | none | none | none | none | aList2 .
+    op init2 : Nat -> State .
+    eq init2(X:Nat) = 0 | none | none | none | none | aList3(X:Nat) [variant].
+    
+    op aList1 : -> ActionList .
+    eq aList1 = createuser("u/aLynx") , createuser("u/b0bbyPR") , createuser("u/chocoSystems") , createuser("u/dedTech") , createsub(0, "r/Maude", "Lorem ipsum") , createsub(0, "r/ModelChecking", "Lorem ipsum") , createsub(0, "r/FormalMethods", "Lorem ipsum") .
+    op aList2 : -> ActionList .
+    eq aList2 = aList1 , createpost(0, 4, "Title", "Text") , reply(3, 7, "Reply") , deletepost(7) .
+    op aList3 : Nat -> ActionList .
+    eq aList3(1) = aList2, createpost(1, 5, "Title2", "Text2") [variant].
